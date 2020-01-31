@@ -1,16 +1,6 @@
 
-AuthorizationApi/.vs/AuthorizationApi/v16/Server/sqlite3/db.lock
-
-AuthorizationApi/.vs/AuthorizationApi/DesignTimeBuild/.dtbcache
-
-AuthorizationApi/.vs/AuthorizationApi/v16/Server/sqlite3/storage.ide
-
-AuthorizationApi/.vs/AuthorizationApi/v16/.suo
-
-AuthorizationApi/.vs/AuthorizationApi/DesignTimeBuild/
+AuthorizationApi/.vs/
 
 AuthorizationApi/bin/Debug/netcoreapp3.0/
 
 AuthorizationApi/obj/
-
-AuthorizationApi/.vs/AuthorizationApi/v16/Server/sqlite3/

@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AuthorizationApi
@@ -28,53 +31,47 @@ namespace AuthorizationApi
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Core API", Version = "v1" });
-            });
-            //services.AddSwaggerGen(x =>
-            //{
-            //    x.SwaggerDoc("v1", new OpenApiInfo
-            //    {
-            //        Title = "Core API",
-            //        Description = "Swagger Core API"
-            //    });
-            //    string xmlPath = Path.Combine(Directory.GetCurrentDirectory(), "ELearning.Api.xml");
-            //    x.IncludeXmlComments(xmlPath);
-            //    x.AddSecurityDefinition("Bearer",
-            //    new ApiKeyScheme
-            //    {
-            //        In = "header",
-            //        Description = "Please enter into this field the word 'Bearer' followed by a space and then JWT",
-            //        Name = "Authorization",
-            //        Type = "apiKey"
-            //    });
-            //    x.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
-            //    { "Bearer", Enumerable.Empty<string>() } });
-            //});
-            // configure jwt authentication
-            JwtToken jwtToken = new JwtToken();
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
-                x.Events = new JwtBearerEvents
+                string xmlPath = Path.Combine(Directory.GetCurrentDirectory(), "AuthorizationApi.xml");
+                c.IncludeXmlComments(xmlPath);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
-                    OnMessageReceived = context =>
-                    {
-                        string value = context.Request.Headers["Authorization"];
-                        if (value != null && value.Contains("Bearer"))
-                        {
-                            string[] aux = value.Split(" ");
-                            value = aux[1];
-                        }
-                        context.Token = value;
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "Please enter into this field the word 'Bearer' followed by a space and then JWT",
+                    Name = "Authorization",
 
-                        return Task.CompletedTask;
-                    }
-                };
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new[] { "readAccess", "writeAccess" } } });
+
+
+                // configure jwt authentication
+                JwtToken jwtToken = new JwtToken();
+                services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            string value = context.Request.Headers["Authorization"];
+                            if (value != null && value.Contains("Bearer"))
+                            {
+                                string[] aux = value.Split(" ");
+                                value = aux[1];
+                            }
+                            context.Token = value;
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
             });
         }
 
