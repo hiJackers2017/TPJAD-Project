@@ -4,5 +4,39 @@
         <name>AuthorizationApi</name>
     </assembly>
     <members>
+        <member name="M:AuthorizationApi.Controllers.AuthenticationController.Put(AuthorizationApi.Domain.Model.AuthenticationCredential)">
+            <summary>
+            This endpoint checks the entered credentials from a person.
+            </summary>
+            <param name="authenticationCredential">Enter a valid AuthenticationCredential model</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationApi.Controllers.AuthenticationController.Put">
+            <summary>
+            This endpoint deletes the token from cookies.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationApi.Controllers.AuthenticationController.LoginCheck">
+            <summary>
+            This endpoint checks the validity of a token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationApi.HashingUtils.ComputeHash(System.String)">
+            <summary>
+            This is a method to compute a hash from a string.
+            </summary>
+            <param name="password">Enter a string to be hashed</param>
+            <returns>A password hash</returns>
+        </member>
+        <member name="M:AuthorizationApi.HashingUtils.IsGivenHashIdenticalWithGivenString(System.String,System.String)">
+            <summary>
+            This is method to check if a given hash is identical with given string
+            </summary>
+            <param name="storedPasswordHash">A password hash</param>
+            <param name="enteredPassword">A password string entered by an user</param>
+            <returns>True if the entered password is identical with a stored hash</returns>
+        </member>
     </members>
 </doc>

@@ -7,9 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AuthorizationApi
@@ -72,6 +70,18 @@ namespace AuthorizationApi
                         }
                     };
                 });
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("OnlyAdmins", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Administrator")));
+                options.AddPolicy("OnlyModerators", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Moderator")));
+                options.AddPolicy("ModeratorsAndMentors", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
+                options.AddPolicy("OnlyStudents", policy =>
+                    policy.Requirements.Add(new RoleRequirement("BasicUser")));
             });
         }
 

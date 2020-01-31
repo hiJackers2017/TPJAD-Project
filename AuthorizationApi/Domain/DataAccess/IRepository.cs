@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace AuthorizationApi.Domain.DataAccess
 {
-    interface IRepository
+    public interface IRepository
     {
-        public void Add(User user);
-        public IList<User> GetAllUsers();
+        void Add(User user);
+        IList<User> GetAllUsers();
+        User GetUserByUsername(string username);
     }
 }
