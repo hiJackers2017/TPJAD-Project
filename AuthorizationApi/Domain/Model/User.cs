@@ -5,6 +5,8 @@ namespace AuthorizationApi.Domain.Model
 {
     public class User : IEquatable<User>
     {
+        public int Id { get; set; }
+
         public string UserName { get; set; }
 
         public string FirstName { get; set; }
@@ -17,9 +19,7 @@ namespace AuthorizationApi.Domain.Model
 
         public string EmailAddress { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
-        public List<UserRole> Roles { get; set; }
+        public ICollection<UserRole>? Roles { get; set; }
 
         public User()
         {
@@ -48,7 +48,6 @@ namespace AuthorizationApi.Domain.Model
                    LastName.Equals(obj.LastName) &&
                    Password.Equals(obj.Password) &&
                    Image.Equals(obj.Image) &&
-                   IsActive == obj.IsActive &&
                    EmailAddress == obj.EmailAddress;
         }
     }

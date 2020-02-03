@@ -19,7 +19,7 @@ namespace AuthorizationApi.Controllers
         /// </summary>
         /// <param name="authenticationCredential">Enter a valid AuthenticationCredential model</param>
         /// <returns></returns>
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPut("login")]
         public ActionResult Put([FromBody] AuthenticationCredential authenticationCredential)
         {
@@ -44,7 +44,7 @@ namespace AuthorizationApi.Controllers
         /// This endpoint deletes the token from cookies.
         /// </summary>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpPut("logout")]
         public ActionResult Put()
         {
@@ -56,7 +56,7 @@ namespace AuthorizationApi.Controllers
         /// This endpoint checks the validity of a token.
         /// </summary>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpPut("login/check")]
         public ActionResult LoginCheck()
         {

@@ -15,7 +15,7 @@ namespace AuthorizationApi.Domain.Repository
                 FirstName = "Marius",
                 LastName = "Popovici",
                 Image = "",
-                Roles = new List<UserRole> { UserRole.Administrator }
+                Roles = new List<UserRole> { new UserRole("Administrator") }
             }
         };
 

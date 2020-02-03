@@ -1,9 +1,13 @@
 ﻿namespace AuthorizationApi.Domain.Model
 {
-    public enum UserRole
+    public class UserRole
     {
-        Administrator,
-        Moderator,
-        BasicUser,
+        public int Id { get; set; }
+        public string Role { get; set; }
+        public UserRole(string role)
+        {
+            Role = role;
+        }
+
     }
 }
