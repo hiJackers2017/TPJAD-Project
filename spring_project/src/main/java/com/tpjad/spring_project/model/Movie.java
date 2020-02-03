@@ -1,7 +1,5 @@
 package com.tpjad.spring_project.model;
 
-import com.tpjad.spring_project.model.BaseEntity;
-
 import javax.persistence.Entity;
 import java.util.Date;
 

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -36,6 +37,7 @@ public class MovieController
     @PostMapping
     public ResponseEntity<Movie> createOrUpdateMovie(Movie movie)
             throws RecordNotFoundException {
+        movie.setCreatedAt(new Date());
         Movie updated = service.createOrUpdateMovie(movie);
         return new ResponseEntity<Movie>(updated, new HttpHeaders(), HttpStatus.OK);
     }
