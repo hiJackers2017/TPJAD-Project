@@ -21,7 +21,7 @@ namespace AuthorizationApi.Controllers
         /// <returns></returns>
         //[AllowAnonymous]
         [HttpPut("login")]
-        public ActionResult Put([FromBody] AuthenticationCredential authenticationCredential)
+        public ActionResult Put([System.Web.Http.FromUri] AuthenticationCredential authenticationCredential)
         {
             AuthenticationCredential authenticationCredentialTest = authenticationCredential;
             LoginAuthentication loginAuthentication = new LoginAuthentication(new Repository(), authenticationCredential);

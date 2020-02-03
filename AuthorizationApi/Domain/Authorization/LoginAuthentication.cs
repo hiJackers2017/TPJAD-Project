@@ -13,7 +13,12 @@ namespace AuthorizationApi.Domain.Authorization
         public LoginAuthentication(IRepository repository, AuthenticationCredential authenticationCredential)
         {
             this.repository = repository ?? throw new ArgumentNullException($"The {nameof(repository)} is null");
-            this.authenticationCredential = authenticationCredential ?? throw new ArgumentNullException($"The {nameof(repository)} is null");
+            this.authenticationCredential = authenticationCredential ?? throw new ArgumentNullException($"The {nameof(authenticationCredential)} is null");
+        }
+
+        public LoginAuthentication(AuthenticationCredential authenticationCredential)
+        {
+            this.authenticationCredential = authenticationCredential ?? throw new ArgumentNullException($"The {nameof(authenticationCredential)} is null");
         }
 
         public JwtToken Handle()

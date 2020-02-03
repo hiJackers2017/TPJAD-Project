@@ -49,44 +49,46 @@ namespace AuthorizationApi
 
 
                 // configure jwt authentication
-                JwtToken jwtToken = new JwtToken();
-                services.AddAuthentication(x =>
-                {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }).AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
-                    x.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            string value = context.Request.Headers["Authorization"];
-                            if (value != null && value.Contains("Bearer"))
-                            {
-                                string[] aux = value.Split(" ");
-                                value = aux[1];
-                            }
-                            context.Token = value;
+                //        JwtToken jwtToken = new JwtToken();
+                //        services.AddAuthentication(x =>
+                //        {
+                //            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                //            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //        }).AddJwtBearer(x =>
+                //        {
+                //            x.RequireHttpsMetadata = false;
+                //            x.SaveToken = true;
+                //            x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
+                //            x.Events = new JwtBearerEvents
+                //            {
+                //                OnMessageReceived = context =>
+                //                {
+                //                    string value = context.Request.Headers["Authorization"];
+                //                    if (value != null && value.Contains("Bearer"))
+                //                    {
+                //                        string[] aux = value.Split(" ");
+                //                        value = aux[1];
+                //                    }
+                //                    context.Token = value;
 
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
-            });
+                //                    return Task.CompletedTask;
+                //                }
+                //            };
+                //        });
+                //    });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("OnlyAdmins", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Administrator")));
-                options.AddPolicy("OnlyModerators", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Moderator")));
-                options.AddPolicy("ModeratorsAndMentors", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
-                options.AddPolicy("OnlyStudents", policy =>
-                    policy.Requirements.Add(new RoleRequirement("BasicUser")));
+                //    services.AddAuthorization(options =>
+                //    {
+                //        options.AddPolicy("OnlyAdmins", policy =>
+                //            policy.Requirements.Add(new RoleRequirement("Administrator")));
+                //        options.AddPolicy("OnlyModerators", policy =>
+                //            policy.Requirements.Add(new RoleRequirement("Moderator")));
+                //        options.AddPolicy("ModeratorsAndMentors", policy =>
+                //            policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
+                //        options.AddPolicy("OnlyStudents", policy =>
+                //            policy.Requirements.Add(new RoleRequirement("BasicUser")));
+                //    });
+                //} 
             });
         }
 
@@ -105,7 +107,7 @@ namespace AuthorizationApi
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Core API"));
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
