@@ -38,23 +38,13 @@ public class MovieService {
         }
     }
 
-    public Movie createOrUpdateMovie(Movie entity) throws RecordNotFoundException
+    public Movie createOrUpdateMovie(Movie entity)
     {
-        Optional<Movie> movie = repository.findById(entity.id);
+        entity = repository.save(entity);
 
-        if(movie.isPresent())
-        {
-            Movie newEntity = new Movie();
-
-            newEntity = repository.save(newEntity);
-
-            return newEntity;
-        } else {
-            entity = repository.save(entity);
-
-            return entity;
-        }
+        return entity;
     }
+
 
     public void deleteMovieById(Long id) throws RecordNotFoundException
     {
