@@ -1,6 +1,8 @@
 using AuthorizationApi.Domain;
+using AuthorizationApi.Domain.Authorization;
 using AuthorizationApi.Domain.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -46,50 +48,48 @@ namespace AuthorizationApi
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new[] { "readAccess", "writeAccess" } } });
-
-
-                // configure jwt authentication
-                //        JwtToken jwtToken = new JwtToken();
-                //        services.AddAuthentication(x =>
-                //        {
-                //            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                //            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //        }).AddJwtBearer(x =>
-                //        {
-                //            x.RequireHttpsMetadata = false;
-                //            x.SaveToken = true;
-                //            x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
-                //            x.Events = new JwtBearerEvents
-                //            {
-                //                OnMessageReceived = context =>
-                //                {
-                //                    string value = context.Request.Headers["Authorization"];
-                //                    if (value != null && value.Contains("Bearer"))
-                //                    {
-                //                        string[] aux = value.Split(" ");
-                //                        value = aux[1];
-                //                    }
-                //                    context.Token = value;
-
-                //                    return Task.CompletedTask;
-                //                }
-                //            };
-                //        });
-                //    });
-
-                //    services.AddAuthorization(options =>
-                //    {
-                //        options.AddPolicy("OnlyAdmins", policy =>
-                //            policy.Requirements.Add(new RoleRequirement("Administrator")));
-                //        options.AddPolicy("OnlyModerators", policy =>
-                //            policy.Requirements.Add(new RoleRequirement("Moderator")));
-                //        options.AddPolicy("ModeratorsAndMentors", policy =>
-                //            policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
-                //        options.AddPolicy("OnlyStudents", policy =>
-                //            policy.Requirements.Add(new RoleRequirement("BasicUser")));
-                //    });
-                //} 
             });
+
+            //configure jwt authentication
+            JwtToken jwtToken = new JwtToken();
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
+                x.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        string value = context.Request.Headers["Authorization"];
+                        if (value != null && value.Contains("Bearer"))
+                        {
+                            string[] aux = value.Split(" ");
+                            value = aux[1];
+                        }
+                        context.Token = value;
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("OnlyAdmins", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Administrator")));
+                options.AddPolicy("OnlyModerators", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Moderator")));
+                options.AddPolicy("ModeratorsAndMentors", policy =>
+                    policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
+                options.AddPolicy("OnlyStudents", policy =>
+                    policy.Requirements.Add(new RoleRequirement("BasicUser")));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, RolesAuthorizationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,7 +107,7 @@ namespace AuthorizationApi
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Core API"));
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

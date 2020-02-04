@@ -4,6 +4,7 @@ using AuthorizationApi.Domain.Model;
 using AuthorizationApi.Domain.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AuthorizationApi.Controllers
 {
@@ -21,9 +22,15 @@ namespace AuthorizationApi.Controllers
         /// <returns></returns>
         //[AllowAnonymous]
         [HttpPut("login")]
-        public ActionResult Put([System.Web.Http.FromUri] AuthenticationCredential authenticationCredential)
+        public async Task<ActionResult> Put([FromBody] AuthenticationCredential authenticationCredential)
         {
-            AuthenticationCredential authenticationCredentialTest = authenticationCredential;
+            LoginAuthenticationRequest request = new LoginAuthenticationRequest
+            {
+                AuthenticationCredential = authenticationCredential
+            };
+
+            request.Validate();
+
             LoginAuthentication loginAuthentication = new LoginAuthentication(new Repository(), authenticationCredential);
             JwtToken token = loginAuthentication.Handle();
 
