@@ -1,16 +1,17 @@
 package com.tpjad.spring_project.web;
 
+import com.tpjad.spring_project.dto.MovieDto;
+import com.tpjad.spring_project.dto.UserDto;
 import com.tpjad.spring_project.exceptions.RecordNotFoundException;
 import com.tpjad.spring_project.model.Movie;
 import com.tpjad.spring_project.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies")
@@ -19,13 +20,24 @@ public class MovieController
     @Autowired
     MovieService service;
 
-
-
     @GetMapping("/all")
-    public ResponseEntity<List<Movie>> getAllMovies() {
+    public ResponseEntity<List<MovieDto>> getAllMovies() {
         List<Movie> list = service.getAllMovies();
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        List<MediaType> mediaList = new ArrayList<MediaType>();
+        mediaList.add(MediaType.APPLICATION_JSON);
+        mediaList.add(MediaType.TEXT_PLAIN);
+        headers.setAccept(mediaList);
+        String resourceUrl = "http://localhost:4000/api/Users/";
+        HttpEntity<String> request = new HttpEntity<>(headers);
 
-        return new ResponseEntity<List<Movie>>(list, new HttpHeaders(), HttpStatus.OK);
+        List<MovieDto> allMovies = list.stream().map(movie -> {
+            ResponseEntity<UserDto> response = restTemplate.exchange(resourceUrl+movie.getCreatedBy().toString(), HttpMethod.GET, request, UserDto.class);
+            UserDto user = response.getBody();
+            return new MovieDto(movie.id, movie.getTitle(), movie.getCreatedAt(), user, movie.getGenre(), movie.getVideoFile());
+        }).collect(Collectors.toList());
+        return new ResponseEntity<>(allMovies, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
