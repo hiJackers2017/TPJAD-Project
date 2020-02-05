@@ -7,7 +7,7 @@ import java.util.Date;
 public class Movie extends BaseEntity {
     private String title;
     private Date createdAt;
-    private Long createdBy;
+    private Integer createdBy;
     private String genre;
     private String videoFile;
 
@@ -27,7 +27,7 @@ public class Movie extends BaseEntity {
         this.createdAt = createdAt;
     }
 
-    public void setCreatedBy(Long createdBy) {
+    public void setCreatedBy(Integer createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -43,7 +43,7 @@ public class Movie extends BaseEntity {
         return createdAt;
     }
 
-    public Long getCreatedBy() {
+    public Integer getCreatedBy() {
         return createdBy;
     }
 

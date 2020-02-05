@@ -9,9 +9,8 @@ import { VideoUploadResponse } from '../_models/videoUpload';
 
 @Component({ templateUrl: 'home.component.html' })
 export class HomeComponent implements OnInit {
-    currentUser: User;
-    isCreateTab = true;
-    currentVideo = new Video(0,"","","","","");
+    isCreateTab = false;
+    currentVideo = new Video(0,"","","","", new User());
     videoForm: FormGroup;
 
     constructor(
@@ -50,21 +49,20 @@ export class HomeComponent implements OnInit {
         }
         
         this.videoService.saveVideoFile(this.videoForm.value.videoFile)
-            .subscribe(response=> {
+            .subscribe(response => {
                 console.log(response);
                 const formData = this.videoForm.value;
+                const user = this.authenticationService.currentUserValue;
                 const video = {
                     title: formData.title,
                     videoFile: response["videoFileName"],
                     genre: formData.genre,
+                    createdBy: user.id,
                 };
-                const videoForm = new FormData();
-                videoForm.append("title", formData.title);
-                videoForm.append("videoFile", response["videoFileName"]);
-                videoForm.append("genre", formData.genre);
-                this.videoService.save(formData)
-                    .subscribe(videoResult => {
-                        console.log(videoResult);
+                this.videoService.save(video)
+                    .subscribe(_ => {
+                        this.videoService.getAll();
+                        this.isCreateTab = false;
                     });
             });
 
@@ -82,5 +80,9 @@ export class HomeComponent implements OnInit {
 
     get videoList():Video[] {
         return this.videoService.getVideoList;
+    }
+
+    get currentUser():User {
+        return this.authenticationService.currentUserValue;
     }
 }

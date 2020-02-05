@@ -5,6 +5,7 @@
 <div class="row container">
     Title: {{currentVideo.title}}
     Genre: {{currentVideo.genre}}
+    Author: {{currentVideo.createdBy.username}}
 </div>
 <div class="row">
     <ul class="nav nav-tabs">
@@ -19,10 +20,16 @@
 <div class="row" *ngIf="!isCreateTab">
     <ul class="list-group">
         <li [ngClass]="{'list-group-item': true,'active': video?.id === currentVideo.id}" class="list-group-item" *ngFor="let video of videoList">
-            [Title: {{video.title}}]  [Genre: {{video.genre}}] [Created at: {{video.createdAt}}]
-            <div class="btn-group" role="group" aria-label="Basic example">
+            [Title: {{video.title}}]  [Genre: {{video.genre}}] [Created by: {{video.createdBy.username}}]
+            <div class="btn-group float-right" role="group" aria-label="Basic example">
                 <button (click)="selectVideo(video)" class="btn btn-info">Play</button>
-                <button (click)="deleteVideo(video.id)" class="btn btn-danger">Delete</button>
+                <button
+                    (click)="deleteVideo(video.id)"
+                    class="btn btn-danger"
+                    *ngIf="video.createdBy.id === currentUser.id"
+                >
+                    Delete
+                </button>
             </div>
         </li>
       </ul>
