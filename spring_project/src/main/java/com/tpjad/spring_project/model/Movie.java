@@ -9,6 +9,15 @@ public class Movie extends BaseEntity {
     private Date createdAt;
     private Long createdBy;
     private String genre;
+    private String videoFile;
+
+    public String getVideoFile() {
+        return videoFile;
+    }
+
+    public void setVideoFile(String videoFile) {
+        this.videoFile = videoFile;
+    }
 
     public void setTitle(String title) {
         this.title = title;
