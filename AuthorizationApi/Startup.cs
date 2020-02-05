@@ -1,6 +1,5 @@
-using AuthorizationApi.Domain;
-using AuthorizationApi.Domain.Authorization;
-using AuthorizationApi.Domain.DataAccess;
+using AuthorizationApi.Helpers;
+using AuthorizationApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -10,9 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Configuration;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace AuthorizationApi
 {
@@ -28,10 +32,13 @@ namespace AuthorizationApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.AddControllers();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<AuthorizationApiContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("AuthorizationApiContext")));
+            services.AddCors();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddSwaggerGen(c =>
             {
@@ -49,47 +56,46 @@ namespace AuthorizationApi
                 {
                     { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new[] { "readAccess", "writeAccess" } } });
             });
+           
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
 
-            //configure jwt authentication
-            JwtToken jwtToken = new JwtToken();
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
+            })
+            .AddJwtBearer(x =>
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = jwtToken.GetTokenValidationParameters();
                 x.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context =>
+                    OnTokenValidated = context =>
                     {
-                        string value = context.Request.Headers["Authorization"];
-                        if (value != null && value.Contains("Bearer"))
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var user = userService.GetById(userId);
+                        if (user == null)
                         {
-                            string[] aux = value.Split(" ");
-                            value = aux[1];
+                           context.Fail("Unauthorized");
                         }
-                        context.Token = value;
-
                         return Task.CompletedTask;
                     }
                 };
-            });
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("OnlyAdmins", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Administrator")));
-                options.AddPolicy("OnlyModerators", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Moderator")));
-                options.AddPolicy("ModeratorsAndMentors", policy =>
-                    policy.Requirements.Add(new RoleRequirement("Administrator,Moderator")));
-                options.AddPolicy("OnlyStudents", policy =>
-                    policy.Requirements.Add(new RoleRequirement("BasicUser")));
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
             });
 
-            services.AddSingleton<IAuthorizationHandler, RolesAuthorizationHandler>();
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -100,6 +106,8 @@ namespace AuthorizationApi
                 app.UseDeveloperExceptionPage();
             }
 
+            //dataContext.Database.Migrate();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -107,6 +115,12 @@ namespace AuthorizationApi
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Core API"));
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

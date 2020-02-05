@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 
 import { User } from '../_models';
-import { config } from "../config";
+import { config } from '../config';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -13,7 +13,7 @@ export class UserService {
     }
 
     register(user: User) {
-        return this.http.post(`${config.apiUrl}/users`, user);
+        return this.http.post(`${config.apiUrl}/users/register`, user);
     }
 
     delete(id: number) {
