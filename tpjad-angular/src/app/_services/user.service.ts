@@ -2,6 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 
 import { User } from '../_models';
+import { config } from "../config";
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
