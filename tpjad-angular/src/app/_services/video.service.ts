@@ -16,8 +16,8 @@ export class VideoService {
         this.videoList = await this.http.get<Video[]>(`${config.springUrl}/all`).toPromise()
     }
 
-    save(video: FormData) {
-        return this.http.post(`${config.springUrl}`, video);
+    save(video: Video) {
+        return this.http.post<Video>(`${config.springUrl}`, video);
     }
 
     saveVideoFile(file: File) {

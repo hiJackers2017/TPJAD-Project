@@ -50,21 +50,15 @@ export class HomeComponent implements OnInit {
         }
         
         this.videoService.saveVideoFile(this.videoForm.value.videoFile)
-            .subscribe(response=> {
+            .subscribe(response => {
                 console.log(response);
                 const formData = this.videoForm.value;
-                const video = {
-                    title: formData.title,
-                    videoFile: response["videoFileName"],
-                    genre: formData.genre,
-                };
-                const videoForm = new FormData();
-                videoForm.append("title", formData.title);
-                videoForm.append("videoFile", response["videoFileName"]);
-                videoForm.append("genre", formData.genre);
-                this.videoService.save(formData)
-                    .subscribe(videoResult => {
-                        console.log(videoResult);
+                const video = new Video(null, formData.title,response["videoFileName"],formData.genre,null,null);
+                console.log(video);
+                this.videoService.save(video)
+                    .subscribe(_ => {
+                        this.videoService.getAll();
+                        this.isCreateTab = false;
                     });
             });
 

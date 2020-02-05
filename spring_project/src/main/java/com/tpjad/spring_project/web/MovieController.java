@@ -37,7 +37,7 @@ public class MovieController
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createOrUpdateMovie(Movie movie)
+    public ResponseEntity<Movie> createOrUpdateMovie(@RequestBody Movie movie)
             throws RecordNotFoundException {
         movie.setCreatedAt(new Date());
         Movie updated = service.createOrUpdateMovie(movie);
