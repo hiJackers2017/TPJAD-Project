@@ -110,21 +110,38 @@ namespace AuthorizationApi.Controllers
             return Ok(model);
         }
 
+        //[AllowAnonymous]
+        //[HttpPut("{id}")]
+        //public IActionResult Update(int id, [FromBody]UpdateModel model)
+        //{
+        //    var user = _mapper.Map<User>(model);
+        //    user.Id = id;
+
+        //    try
+        //    {
+        //        _userService.Update(user, model.Password);
+        //        return Ok();
+        //    }
+        //    catch (AppException ex)
+        //    {
+        //      return BadRequest(new { message = ex.Message });
+        //    }
+        //}
+
         [AllowAnonymous]
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UpdateModel model)
+        [HttpPut()]
+        public IActionResult UsersById([FromBody]UserListModel model)
         {
-            var user = _mapper.Map<User>(model);
-            user.Id = id;
+            var usersIds = model.UsersIds;
 
             try
             {
-                _userService.Update(user, model.Password);
-                return Ok();
+                var users = _userService.GetUsersById(usersIds);
+                return Ok(users);
             }
             catch (AppException ex)
             {
-              return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
 

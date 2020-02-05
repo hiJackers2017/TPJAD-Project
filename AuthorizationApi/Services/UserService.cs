@@ -70,24 +70,20 @@ namespace AuthorizationApi.Services
             if (user == null)
                 throw new AppException("User not found");
 
-            // update username if it has changed
             if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
             {
-                // throw error if the new username is already taken
                 if (_context.Users.Any(x => x.Username == userParam.Username))
                     throw new AppException("Username " + userParam.Username + " is already taken");
 
                 user.Username = userParam.Username;
             }
 
-            // update user properties if provided
             if (!string.IsNullOrWhiteSpace(userParam.FirstName))
                 user.FirstName = userParam.FirstName;
 
             if (!string.IsNullOrWhiteSpace(userParam.LastName))
                 user.LastName = userParam.LastName;
 
-            // update password if provided
             if (!string.IsNullOrWhiteSpace(password))
             {
                 byte[] passwordHash, passwordSalt;
@@ -109,6 +105,20 @@ namespace AuthorizationApi.Services
                 _context.Users.Remove(user);
                 _context.SaveChanges();
             }
+        }
+
+        public IList<UserDto> GetUsersById(IList<int> userIds)
+        {
+            IList<UserDto> foundUsers = new List<UserDto>();
+            foreach (var id in userIds)
+            {
+                User user = GetById(id);
+                if (user != null) 
+                {
+                    foundUsers.Add(new UserDto(user));
+                }
+            }
+            return foundUsers;
         }
 
         // private helper methods
@@ -143,5 +153,6 @@ namespace AuthorizationApi.Services
 
             return true;
         }
+
     }
 }
